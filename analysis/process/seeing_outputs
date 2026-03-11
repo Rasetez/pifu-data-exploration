@@ -1,0 +1,10 @@
+library(readr)
+
+# Read the CSV created in Python
+all_opa <- read_csv("all_outpatient_visits.csv")
+
+# Display the first few rows
+head(all_opa)
+
+# Optionally, display the whole table in a nicer view
+View(all_opa)

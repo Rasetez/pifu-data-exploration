@@ -19,6 +19,11 @@ all_opa = opa.where(
 
 show(all_opa)
 
+# Save the filtered outpatient visits to a CSV file
+all_opa.to_csv("all_outpatient_visits.csv", index=False)
+print("CSV saved as all_outpatient_visits.csv")
+
+
 # pfu only
 pfu_only = all_opa.where(
         all_opa.outcome_of_attendance.is_in(["4","5"])
