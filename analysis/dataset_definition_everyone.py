@@ -30,6 +30,11 @@ pfu_only = all_opa.where(
 
 show(pfu_only)
 
+debug_dataset = create_dataset()
+debug_dataset.add_table("all_opa", all_opa)
+debug_dataset.add_table("pfu_only", pfu_only)
+
+
 from analysis.variable_function import opa_characteristics
 
 dataset = opa_characteristics(all_opa, pfu_only)
