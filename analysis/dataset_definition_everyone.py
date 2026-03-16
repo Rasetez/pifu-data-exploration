@@ -18,11 +18,12 @@ all_opa = opa.where(
 
 show(all_opa)
 
- all_opa_df = all_opa.to_pandas()
- all_opa_df.to_csv("output/debug_all_opa.csv", index=False)
+all_opa_df = all_opa.to_pandas()
+all_opa_df.to_csv("output/debug_all_opa.csv", index=False)
 
 
 # pfu only
+
 pfu_only = all_opa.where(
         all_opa.outcome_of_attendance.is_in(["4","5"])
         & all_opa.appointment_date.is_on_or_between("2022-06-01","2025-12-31")
