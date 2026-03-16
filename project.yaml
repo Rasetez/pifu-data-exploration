@@ -201,10 +201,3 @@ actions:
   #   outputs:
   #     moderately_sensitive:
   #       table: output/processed/visit_stats.csv
-
-  show_opa_csv:
-    run: r:latest analysis/seeing_outputs.R
-    needs: [generate_dataset]  # optional, only if it depends on your Python dataset
-    outputs:
-      moderately_sensitive:
-        opa_csv: output/all_outpatient_visits_processed.csv
