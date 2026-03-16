@@ -18,8 +18,8 @@ all_opa = opa.where(
 
 show(all_opa)
 
-# all_opa_df = all_opa.to_pandas()
-# all_opa_df.to_csv("output/debug_all_opa.csv", index=False)
+ all_opa_df = all_opa.to_pandas()
+ all_opa_df.to_csv("output/debug_all_opa.csv", index=False)
 
 
 # pfu only
@@ -30,9 +30,6 @@ pfu_only = all_opa.where(
 
 show(pfu_only)
 
-debug_dataset = create_dataset()
-debug_dataset.add_table("all_opa", all_opa)
-debug_dataset.add_table("pfu_only", pfu_only)
 
 
 from analysis.variable_function import opa_characteristics
