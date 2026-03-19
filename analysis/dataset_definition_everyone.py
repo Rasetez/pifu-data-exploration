@@ -18,8 +18,8 @@ all_opa = opa.where(
 
 show(all_opa)
 
-all_opa_df = all_opa.to_pandas()
-all_opa_df.to_csv("output/debug_all_opa.csv", index=False)
+# all_opa_df = all_opa.to_pandas()
+# all_opa_df.to_csv("output/debug_all_opa.csv", index=False)
 
 
 # pfu only
