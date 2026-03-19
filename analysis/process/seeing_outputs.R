@@ -1,7 +1,291 @@
-read.csv("dummy_tables/opa.csv")
+thingy<-read.csv("dummy_tables/opa.csv")
 
-data <- read.csv("output/dataset_everyone.csv.gz")
 
 dataset <- read.csv("output/dataset_everyone.csv.gz")
 
 all_opa <- read.csv("output/debug_all_opa.csv")
+
+
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Clean status column (column 3)
+# -------------------------------
+data[[3]] <- trimws(as.character(data[[3]]))  # remove spaces
+
+# -------------------------------
+# 3. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+# Function to safely parse dates
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for any remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 4. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 5. Define NEW date range
+# -------------------------------
+start_date <- as.Date("2022-06-01")
+end_date   <- as.Date("2025-12-31")
+
+# -------------------------------
+# 6. Filter data
+# -------------------------------
+filtered_data <- data[
+  data[[2]] >= start_date &
+    data[[2]] <= end_date &
+    data[[3]] %in% c("5", "6"),
+]
+
+# -------------------------------
+# 7. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
+
+
+
+
+filtered_data2 <- filtered_data[
+  trimws(as.character(filtered_data[[5]])) %in% c("4", "5"),  # column 5 filter
+]
+
+# -------------------------------
+# 2. View the new filtered dataset
+# -------------------------------
+View(filtered_data2)
+head(filtered_data2)
+nrow(filtered_data2)
+
+
+
+
+
+
+
+
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+# Function to safely parse dates
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 3. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 4. Define date range for 2024 only
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+# -------------------------------
+# 5. Filter data by date only
+# -------------------------------
+filtered_data <- data[
+  data[[2]] >= start_date &
+    data[[2]] <= end_date,
+]
+
+# -------------------------------
+# 6. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
+
+
+
+
+
+
+
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Clean status column (column 3)
+# -------------------------------
+data[[3]] <- trimws(as.character(data[[3]]))  # remove spaces
+
+# -------------------------------
+# 3. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+# Function to safely parse dates
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for any remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 4. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 5. Define NEW date range
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+# -------------------------------
+# 6. Filter data
+# -------------------------------
+filtered_data <- data[
+  data[[2]] >= start_date &
+    data[[2]] <= end_date &
+    data[[3]] %in% c("5", "6"),
+]
+
+# -------------------------------
+# 7. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
+
+
+
+
+
+
+
+
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+# Function to safely parse dates
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 3. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 4. Define date range for 2024 only
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+# -------------------------------
+# 5. Ensure column 6 is character
+# -------------------------------
+data[[6]] <- as.character(data[[6]])
+
+# -------------------------------
+# 6. Filter data by date AND column 6
+# -------------------------------
+filtered_data <- data[
+  data[[2]] >= start_date &
+    data[[2]] <= end_date &
+    data[[6]] == "410",
+]
+
+# -------------------------------
+# 7. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
+
+
+
+
+
+
+
+
