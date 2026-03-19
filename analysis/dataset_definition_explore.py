@@ -9,9 +9,12 @@ from ehrql.tables.tpp import patients, practice_registrations, clinical_events, 
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size=10000)
 
+show(opa)
 
 total_opa = opa.where(opa.appointment_date.is_on_or_between("2024-01-01","2024-12-31"))
 total_opa_date = total_opa.appointment_date
+
+show(total_opa)
 
 attended_opa = opa.where(
     opa.appointment_date.is_on_or_between("2024-01-01","2024-12-31")
