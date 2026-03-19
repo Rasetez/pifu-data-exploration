@@ -150,8 +150,6 @@ nrow(filtered_data)
 
 
 
-
-
 # -------------------------------
 # 1. Load CSV
 # -------------------------------
@@ -418,3 +416,97 @@ patients_dataset[is.na(count_same_day), count_same_day := 0]
 View(patients_dataset)
 head(patients_dataset)
 nrow(patients_dataset)
+
+
+
+
+
+
+
+
+
+
+
+library(data.table)
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- fread("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+data[[3]] <- trimws(as.character(data[[3]]))  # clean text
+data <- data[data[[3]] %in% c("5", "6"), ]    # keep only 5 and 6
+
+
+# -------------------------------
+# 2. Parse appointment date (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 3. Remove invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 4. Filter to 2024 only
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+data_2024 <- data[data[[2]] >= start_date & data[[2]] <= end_date, ]
+
+# -------------------------------
+# 5. Count same-day appointments per patient (duplicates only)
+# -------------------------------
+setDT(data_2024)
+count_same_day <- data_2024[
+  , .N, by = .(patient_id = data_2024[[1]], appointment_date = data_2024[[2]])
+][
+  N > 1, .(count_same_day = sum(N)), by = patient_id
+]
+
+# -------------------------------
+# 6. Count all appointments per patient
+# -------------------------------
+count_all <- data_2024[, .(count_all = .N), by = .(patient_id = data_2024[[1]])]
+
+# -------------------------------
+# 7. Create patient-level dataset and merge counts
+# -------------------------------
+patients_dataset <- unique(data_2024[, .(patient_id = data_2024[[1]])])
+
+patients_dataset <- merge(patients_dataset, count_same_day, by = "patient_id", all.x = TRUE)
+patients_dataset <- merge(patients_dataset, count_all, by = "patient_id", all.x = TRUE)
+
+# Replace NA with 0 for patients with no duplicates
+patients_dataset[is.na(count_same_day), count_same_day := 0]
+patients_dataset[is.na(count_all), count_all := 0]
+
+# -------------------------------
+# 8. View results
+# -------------------------------
+View(patients_dataset)
+head(patients_dataset)
+nrow(patients_dataset)
+
+
+
+

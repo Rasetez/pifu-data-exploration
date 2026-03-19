@@ -9,12 +9,16 @@ from ehrql.tables.tpp import patients, practice_registrations, clinical_events, 
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size=10000)
 
-show(opa)
+#show(dataset)
+
+#show(opa)
 
 total_opa = opa.where(opa.appointment_date.is_on_or_between("2024-01-01","2024-12-31"))
 total_opa_date = total_opa.appointment_date
 
-show(total_opa)
+#show(total_opa)
+
+#show(total_opa_date)
 
 attended_opa = opa.where(
     opa.appointment_date.is_on_or_between("2024-01-01","2024-12-31")
@@ -22,11 +26,17 @@ attended_opa = opa.where(
     )
 attended_opa_date = attended_opa.appointment_date
 
+#show(attended_opa)
+
+#show(attended_opa_date)
+
 rheum_opa = opa.where(
     opa.appointment_date.is_on_or_between("2024-01-01","2024-12-31")
     & opa.treatment_function_code.is_in(["410"])
 )
 rheum_opa_date = rheum_opa.appointment_date
+
+#show(rheum_opa)
 
 rheum_attended_opa = opa.where(
     opa.appointment_date.is_on_or_between("2024-01-01","2024-12-31")
@@ -44,6 +54,8 @@ dataset.count_all = total_opa.count_for_patient()
 dataset.count_all_attended = attended_opa.count_for_patient()
 dataset.count_rheum = rheum_opa.count_for_patient()
 dataset.count_rheum_attended = rheum_attended_opa.count_for_patient()
+
+show(dataset.count_all_attended)
 
 first_opa = attended_opa.sort_by(
         opa.appointment_date
@@ -101,3 +113,5 @@ dataset.define_population(
     & (practice_registrations.for_patient_on("2024-01-01").exists_for_patient())
     & attended_opa.exists_for_patient()
 )
+
+#show(dataset)

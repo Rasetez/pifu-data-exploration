@@ -9,6 +9,7 @@ from ehrql.tables.tpp import patients, practice_registrations, clinical_events, 
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size=5000)
 
+show(opa)
 
 # all outpatient visits - to measure before / after start of personalised follow-up
 all_opa = opa.where(
