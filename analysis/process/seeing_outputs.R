@@ -287,5 +287,134 @@ nrow(filtered_data)
 
 
 
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+# Function to safely parse dates
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 3. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 4. Define date range for 2024 only
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+# -------------------------------
+# 5. Filter data by date only
+# -------------------------------
+filtered_data <- data[
+  data[[2]] >= start_date &
+    data[[2]] <= end_date,
+]
+
+# -------------------------------
+# 6. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
 
 
+
+
+
+
+library(data.table)
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- fread("dummy_tables/opa.csv", stringsAsFactors = FALSE)  # data.table is faster
+
+# -------------------------------
+
+data[[3]] <- trimws(as.character(data[[3]]))  # clean text
+data <- data[data[[3]] %in% c("5", "6"), ]    # keep only 5 and 6
+
+
+# 2. Parse appointment date (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 3. Remove invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 4. Filter appointments in 2024
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+data_2024 <- data[data[[2]] >= start_date & data[[2]] <= end_date, ]
+
+# -------------------------------
+# 5. Count same-day appointments per patient
+# -------------------------------
+setDT(data_2024)  # ensure data.table
+count_same_day <- data_2024[, .N, by = .(patient_id = data_2024[[1]], appointment_date = data_2024[[2]])]
+count_same_day <- count_same_day[, .(count_same_day = sum(N)), by = patient_id]
+
+# -------------------------------
+# 6. Merge count_same_day back to patient-level dataset
+# -------------------------------
+# Create a dataset with one row per patient
+patients_dataset <- unique(data_2024[, .(patient_id = data_2024[[1]])])
+patients_dataset <- merge(patients_dataset, count_same_day, by = "patient_id", all.x = TRUE)
+
+# Fill NA (patients with no appointments) with 0
+patients_dataset[is.na(count_same_day), count_same_day := 0]
+
+# -------------------------------
+# 7. View results
+# -------------------------------
+View(patients_dataset)
+head(patients_dataset)
+nrow(patients_dataset)
