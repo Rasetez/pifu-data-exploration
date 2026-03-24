@@ -55,11 +55,13 @@ dataset.count_all_attended = attended_opa.count_for_patient()
 dataset.count_rheum = rheum_opa.count_for_patient()
 dataset.count_rheum_attended = rheum_attended_opa.count_for_patient()
 
-show(dataset.count_all_attended)
+#show(dataset.count_all_attended)
 
 first_opa = attended_opa.sort_by(
         opa.appointment_date
     ).first_for_patient()
+
+#show(first_opa)
 
 first_rheum_opa = rheum_attended_opa.sort_by(
         opa.appointment_date
@@ -71,6 +73,8 @@ first_pfu = attended_opa.where(
         attended_opa.appointment_date
     ).first_for_patient()
 
+#show(first_pfu)
+
 first_rheum_pfu = rheum_attended_opa.where(
         rheum_attended_opa.outcome_of_attendance.is_in(["4","5"])   
     ).sort_by(
@@ -79,6 +83,7 @@ first_rheum_pfu = rheum_attended_opa.where(
 
 
 dataset.any_opa = first_opa.exists_for_patient()
+show(dataset.any_opa)
 dataset.outcome_of_attendance = first_opa.outcome_of_attendance
 dataset.treatment_function_code = first_opa.treatment_function_code  # specialty
 dataset.attendance_status = first_opa.attendance_status

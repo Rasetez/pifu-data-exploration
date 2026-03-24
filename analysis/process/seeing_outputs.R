@@ -1,4 +1,4 @@
-thingy<-read.csv("dummy_tables/opa.csv")
+
 
 
 dataset <- read.csv("output/dataset_everyone.csv.gz")
@@ -506,6 +506,158 @@ patients_dataset[is.na(count_all), count_all := 0]
 View(patients_dataset)
 head(patients_dataset)
 nrow(patients_dataset)
+
+
+
+
+
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Clean attendance column (column 5) strictly
+# -------------------------------
+# Remove all non-digit characters and convert to numeric
+data[[5]] <- as.numeric(gsub("[^0-9]", "", data[[5]]))
+
+# -------------------------------
+# 3. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+parse_date_safe <- function(x) {
+  if(all(grepl("^[0-9]+(\\.[0-9]+)?$", x))) {
+    return(as.Date(floor(as.numeric(x)), origin = "1899-12-30"))
+  }
+  out <- as.Date(x, format = "%d/%m/%Y")
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 4. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 5. Define NEW date range
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+# -------------------------------
+# 6. Filter data by date AND attendance (strict numeric)
+# -------------------------------
+library(dplyr)
+
+filtered_data <- data %>%
+  filter(
+    !is.na(data[[5]]),          # remove NAs
+    data[[5]] %in% c(4,5),      # strictly numeric 4 or 5
+    data[[2]] >= start_date,
+    data[[2]] <= end_date
+  ) %>%
+  arrange(data[[1]], data[[2]]) %>%  # sort by patient then date
+  group_by(data[[1]]) %>%            # group by patient
+  slice(1) %>%                        # first appointment per patient
+  ungroup()
+
+# -------------------------------
+# 7. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
+
+
+
+
+
+
+
+
+
+# -------------------------------
+# 1. Load CSV
+# -------------------------------
+data <- read.csv("dummy_tables/opa.csv", stringsAsFactors = FALSE)
+
+# -------------------------------
+# 2. Clean status column (column 3)
+# -------------------------------
+data[[3]] <- trimws(as.character(data[[3]]))  # remove spaces
+
+# -------------------------------
+# 3. Parse date column (column 2)
+# -------------------------------
+data[[2]] <- as.character(data[[2]])
+
+# Function to safely parse dates
+parse_date_safe <- function(x) {
+  # Try Excel numeric
+  if(all(grepl("^[0-9]+$", x))) {
+    return(as.Date(as.numeric(x), origin = "1899-12-30"))
+  }
+  # Try dd/mm/yyyy
+  out <- as.Date(x, format = "%d/%m/%Y")
+  # Try dd/mm/yy for any remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%d/%m/%y")
+  # Try yyyy-mm-dd for remaining NAs
+  na_idx <- is.na(out)
+  out[na_idx] <- as.Date(x[na_idx], format = "%Y-%m-%d")
+  return(out)
+}
+
+data[[2]] <- parse_date_safe(data[[2]])
+
+# -------------------------------
+# 4. Remove rows with invalid dates
+# -------------------------------
+data <- data[!is.na(data[[2]]), ]
+
+# -------------------------------
+# 5. Define NEW date range
+# -------------------------------
+start_date <- as.Date("2024-01-01")
+end_date   <- as.Date("2024-12-31")
+
+# -------------------------------
+# 6. Filter data
+# -------------------------------
+filtered_data <- data[
+  data[[2]] >= start_date &
+    data[[2]] <= end_date &
+    data[[3]] %in% c("5", "6") &
+    data[[5]] %in% c("4", "5"),
+]
+
+# -------------------------------
+# 7. View filtered data
+# -------------------------------
+View(filtered_data)
+head(filtered_data)
+nrow(filtered_data)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
