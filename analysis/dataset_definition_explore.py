@@ -26,7 +26,7 @@ attended_opa = opa.where(
     )
 attended_opa_date = attended_opa.appointment_date
 
-#show(attended_opa)
+show(attended_opa)
 
 #show(attended_opa_date)
 
@@ -83,8 +83,9 @@ first_rheum_pfu = rheum_attended_opa.where(
 
 
 dataset.any_opa = first_opa.exists_for_patient()
-show(dataset.any_opa)
+#show(dataset.any_opa)
 dataset.outcome_of_attendance = first_opa.outcome_of_attendance
+show(dataset.outcome_of_attendance)
 dataset.treatment_function_code = first_opa.treatment_function_code  # specialty
 dataset.attendance_status = first_opa.attendance_status
 dataset.consultation_medium_used = first_opa.consultation_medium_used
